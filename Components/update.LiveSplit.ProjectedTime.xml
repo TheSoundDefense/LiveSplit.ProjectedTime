@@ -1,4 +1,26 @@
 <updates>
+  <update version="1.1.0">
+    <files>
+      <file path="Components/LiveSplit.ProjectedTime.dll" status="changed" />
+    </files>
+    <changelog>
+      <change>
+        Users can now change the text and background colors to their preferred custom colors.
+      </change>
+      <change>
+        The projected time can now change color to reflect the current pace.
+      </change>
+      <change>
+        Users can choose the number of decimal points when displaying the completion percentage (and whether or not to display trailing zeroes.)
+      </change>
+      <change>
+        Fixed an issue where the projected time did not reset when splits were reset.
+      </change>
+      <change>
+        Fixed an issue where the choice to display completion percentage was not saved.
+      </change>
+    </changelog>
+  </update>
   <update version="1.0.0">
     <files>
       <file path="Components/LiveSplit.ProjectedTime.dll" status="changed" />

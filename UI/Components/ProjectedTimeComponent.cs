@@ -28,9 +28,23 @@ namespace LiveSplit.UI.Components
         protected bool BoundsValid { get; set; }
         protected bool SplitCompletionsValid { get; set; }
         protected bool CurrentProjectionValid { get; set; }
-        protected float CurrentProgress { get; set; }
+        protected Time CurrentProjectedTime { get; set; }
+        protected enum PaceCategory
+        {
+            Tied = 0,
+            AheadGainingTime = 1,
+            AheadLosingTime = 2,
+            BehindGainingTime = 3,
+            BehindLosingTime = 4
+        }
+        protected PaceCategory CurrentPaceCategory { get; set; }
 
-        protected Time FinalSplitTime { get; set; }
+        // This time utilizes whatever the current projection basis is. This is used to calculate
+        // the runner's progress and their projected time.
+        protected Time FinalSplitTimeForComputation { get; set; }
+        // This time utilizes whatever comparison the runner is using for their splits. This is
+        // used to color the projected time display.
+        protected Time FinalSplitTimeForDisplay { get; set; }
         // These inverse variables just speed up computation.
         protected double InverseFinalRealTimeMillis { get; set; }
         protected double InverseFinalGameTimeMillis { get; set; }
@@ -69,13 +83,13 @@ namespace LiveSplit.UI.Components
             state.OnSplit += state_OnSplitChange;
             state.OnSkipSplit += state_OnSplitChange;
             state.OnUndoSplit += state_OnSplitChange;
-            state.OnSwitchComparisonNext += state_OnSwitchComparison;
-            state.OnSwitchComparisonPrevious += state_OnSwitchComparison;
+            state.OnReset += state_OnReset;
             CurrentState = state;
 
             BoundsValid = false;
             SplitCompletionsValid = false;
             CurrentProjectionValid = false;
+            CurrentPaceCategory = PaceCategory.Tied;
             // Initializing to avoid potential null reference errors.
             ActualComparison = "";
         }
@@ -95,37 +109,69 @@ namespace LiveSplit.UI.Components
             CurrentProjectionValid = false;
         }
 
-        void state_OnSwitchComparison(object sender, EventArgs e)
+        void state_OnReset(object sender, TimerPhase e)
         {
-            // Invalidate the underlying data structures, so they are recalculated at the next
-            // opportunity.
-            SplitCompletionsValid = false;
+            // Invalidate the current projection, so it's reculated at the next opportunity.
             CurrentProjectionValid = false;
+        }
+
+        private Color GetValueForeColor(LiveSplitState state)
+        {
+            if (Settings.PaceProjectionColor)
+            {
+                return GetPaceColor(state);
+            }
+
+            return Settings.OverrideProjectionColor
+                ? Settings.ProjectionColor
+                : state.LayoutSettings.TextColor;
+        }
+
+        private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
+        {
+            if (Settings.BackgroundColor1.A > 0
+                || Settings.BackgroundGradient != GradientType.Plain
+                && Settings.BackgroundColor2.A > 0)
+            {
+                var gradientBrush = new LinearGradientBrush(
+                            new PointF(0, 0),
+                            Settings.BackgroundGradient == GradientType.Horizontal
+                            ? new PointF(width, 0)
+                            : new PointF(0, height),
+                            Settings.BackgroundColor1,
+                            Settings.BackgroundGradient == GradientType.Plain
+                            ? Settings.BackgroundColor1
+                            : Settings.BackgroundColor2);
+                g.FillRectangle(gradientBrush, 0, 0, width, height);
+            }
         }
 
         public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
         {
+            DrawBackground(g, state, HorizontalWidth, height);
+
             InternalComponent.NameLabel.HasShadow
                 = InternalComponent.ValueLabel.HasShadow
                 = state.LayoutSettings.DropShadows;
 
-            InternalComponent.NameLabel.ForeColor = state.LayoutSettings.TextColor;
-            InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
+            InternalComponent.NameLabel.ForeColor = Settings.OverrideLabelColor ? Settings.LabelColor : state.LayoutSettings.TextColor;
+            InternalComponent.ValueLabel.ForeColor = GetValueForeColor(state);
 
             InternalComponent.DrawHorizontal(g, state, height, clipRegion);
         }
 
-        // We will be adding the ability to display the component across two rows in our settings menu.
         public void DrawVertical(Graphics g, LiveSplitState state, float width, Region clipRegion)
         {
+            DrawBackground(g, state, width, VerticalHeight);
+
             InternalComponent.DisplayTwoRows = Settings.Display2Rows;
 
             InternalComponent.NameLabel.HasShadow
                 = InternalComponent.ValueLabel.HasShadow
                 = state.LayoutSettings.DropShadows;
 
-            InternalComponent.NameLabel.ForeColor = state.LayoutSettings.TextColor;
-            InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
+            InternalComponent.NameLabel.ForeColor = Settings.OverrideLabelColor ? Settings.LabelColor : state.LayoutSettings.TextColor;
+            InternalComponent.ValueLabel.ForeColor = GetValueForeColor(state);
 
             InternalComponent.DrawVertical(g, state, width, clipRegion);
         }
@@ -153,11 +199,12 @@ namespace LiveSplit.UI.Components
             ActualComparison = GetActualComparison(state);
             ActualTimingMethod = GetActualTimingMethod(state);
 
-            FinalSplitTime = GetSegmentTime(state.Run.Last());
+            FinalSplitTimeForComputation = GetSegmentTime(state.Run.Last());
+            FinalSplitTimeForDisplay = GetFinalSplitTimeForDisplay(state);
             // If the player has no final split time for the run, we can't make an estimate.
-            if (!IsTimeEmpty(FinalSplitTime))
+            if (!IsTimeEmpty(FinalSplitTimeForComputation))
             {
-                if (FinalSplitTime.RealTime is TimeSpan pbRealTime)
+                if (FinalSplitTimeForComputation.RealTime is TimeSpan pbRealTime)
                 {
                     InverseFinalRealTimeMillis = (float)(1.0 / pbRealTime.TotalMilliseconds);
                 }
@@ -165,7 +212,7 @@ namespace LiveSplit.UI.Components
                 {
                     InverseFinalRealTimeMillis = 0;
                 }
-                if (FinalSplitTime.GameTime is TimeSpan pbGameTime)
+                if (FinalSplitTimeForComputation.GameTime is TimeSpan pbGameTime)
                 {
                     InverseFinalGameTimeMillis = (float)(1.0 / pbGameTime.TotalMilliseconds);
                 }
@@ -177,6 +224,10 @@ namespace LiveSplit.UI.Components
                 SplitCompletions = BuildSplitCompletions(state);
                 InvertedSplitCompletions = InvertSplitCompletions(SplitCompletions);
             }
+
+            // In this initialization state, the current projected time is the final split time
+            // used for computation. This will be updated before the time is drawn again.
+            CurrentProjectedTime = FinalSplitTimeForComputation;
 
             // Validate the data structures, so we don't do this again right away.
             SplitCompletionsValid = true;
@@ -244,7 +295,7 @@ namespace LiveSplit.UI.Components
         float DivideTimeByFinalSplit(Time time)
         {
             // Just to prevent crashing. This should not occur.
-            if (IsTimeEmpty(FinalSplitTime))
+            if (IsTimeEmpty(FinalSplitTimeForComputation))
             {
                 return 0;
             }
@@ -281,6 +332,20 @@ namespace LiveSplit.UI.Components
 
             return segment.Comparisons.ContainsKey(ActualComparison)
                 ? segment.Comparisons[ActualComparison]
+                : new Time();
+        }
+
+        // Obtains the final time of the user's currently displayed splits.
+        Time GetFinalSplitTimeForDisplay(LiveSplitState state)
+        {
+            ISegment finalSegment = state.Run.Last();
+            if ("Personal Best".Equals(state.CurrentComparison))
+            {
+                return finalSegment.PersonalBestSplitTime;
+            }
+
+            return finalSegment.Comparisons.ContainsKey(state.CurrentComparison)
+                ? finalSegment.Comparisons[state.CurrentComparison]
                 : new Time();
         }
 
@@ -412,7 +477,7 @@ namespace LiveSplit.UI.Components
             // If we're on the first split, there's nothing we can really extrapolate.
             if (state.CurrentSplitIndex == 0)
             {
-                return FinalSplitTime;
+                return FinalSplitTimeForComputation;
             }
 
             // Move backwards through the splits, finding the first segment with a valid delta.
@@ -422,12 +487,12 @@ namespace LiveSplit.UI.Components
                 Time projectedDelta = GetProjectedTotalDeltaForSegmentWithDelta(state, i);
                 if (!IsTimeEmpty(projectedDelta))
                 {
-                    return FinalSplitTime + projectedDelta;
+                    return FinalSplitTimeForComputation + projectedDelta;
                 }
             }
 
             // If we got here, there are no splits with valid deltas.
-            return FinalSplitTime;
+            return FinalSplitTimeForComputation;
         }
 
         // Get the current completion progress.
@@ -440,7 +505,7 @@ namespace LiveSplit.UI.Components
             }
 
             // If there is no final split time for the run, we can't make an estimate.
-            if (IsTimeEmpty(FinalSplitTime))
+            if (IsTimeEmpty(FinalSplitTimeForComputation))
             {
                 return -1;
             }
@@ -479,6 +544,50 @@ namespace LiveSplit.UI.Components
             return Math.Min(lowerCompletionBound + elapsedTimeCompletion, upperCompletionBound);
         }
 
+        // Returns the pace category, given the new time, the previous time, and the final time
+        // being used for display.
+        PaceCategory GetCurrentPaceCategory(TimeSpan newTime, TimeSpan previousTime)
+        {
+            TimeSpan displayedFinalTimeSpan = FinalSplitTimeForDisplay[ActualTimingMethod] ?? TimeSpan.Zero;
+            if (newTime == displayedFinalTimeSpan)
+            {
+                // The runner is tied with their displayed final time.
+                return PaceCategory.Tied;
+            }
+            if (newTime < previousTime)
+            {
+                // The runner is gaining time.
+                return newTime < displayedFinalTimeSpan
+                    ? PaceCategory.AheadGainingTime
+                    : PaceCategory.BehindGainingTime;
+            }
+            else
+            {
+                // The runner is losing time.
+                return newTime < displayedFinalTimeSpan
+                    ? PaceCategory.AheadLosingTime
+                    : PaceCategory.BehindLosingTime;
+            }
+        }
+
+        // Get the color corresponding to the current pace category.
+        Color GetPaceColor(LiveSplitState state)
+        {
+            switch (CurrentPaceCategory)
+            {
+                case PaceCategory.AheadGainingTime:
+                    return state.LayoutSettings.AheadGainingTimeColor;
+                case PaceCategory.AheadLosingTime:
+                    return state.LayoutSettings.AheadLosingTimeColor;
+                case PaceCategory.BehindGainingTime:
+                    return state.LayoutSettings.BehindGainingTimeColor;
+                case PaceCategory.BehindLosingTime:
+                    return state.LayoutSettings.BehindLosingTimeColor;
+                default:
+                    return state.LayoutSettings.TextColor;
+            }
+        }
+
         // This is the function where we decide what needs to be displayed at this moment in time,
         // and tell the internal component to display it. This function is called hundreds to
         // thousands of times per second.
@@ -503,7 +612,21 @@ namespace LiveSplit.UI.Components
             if (Settings.DisplayCompletionPercent)
             {
                 float completion = GetProgress(state) * 100;
-                InternalComponent.InformationName = $"{ComponentName} ({completion:0.##}%)";
+                string completionFormat = $"{completion:0}%";
+                if (Settings.CompletionAccuracy == ProjectedTimeSettings.DecimalAccuracy.OneDecimal)
+                {
+                    completionFormat = Settings.ShowTrailingZeroes
+                        ? $"{completion:0.0}%"
+                        : $"{completion:0.#}%";
+                }
+                else if (Settings.CompletionAccuracy == ProjectedTimeSettings.DecimalAccuracy.TwoDecimal)
+                {
+                    completionFormat = Settings.ShowTrailingZeroes
+                        ? $"{completion:0.00}%"
+                        : $"{completion:0.##}%";
+                }
+                completionFormat = completion >= 0 ? completionFormat : "?";
+                InternalComponent.InformationName = $"{ComponentName} ({completionFormat})";
             }
             else
             {
@@ -512,7 +635,27 @@ namespace LiveSplit.UI.Components
 
             if (!CurrentProjectionValid)
             {
-                InternalComponent.TimeValue = GetProjectedTimeForLastSegmentWithDelta(state)[ActualTimingMethod];
+                // Get the new projected time.
+                Time newProjectedTime = GetProjectedTimeForLastSegmentWithDelta(state);
+                TimeSpan newProjectedTimeSpan = newProjectedTime[ActualTimingMethod] ?? TimeSpan.Zero;
+
+                // Update the current pace category.
+                if (state.CurrentSplitIndex <= 0)
+                {
+                    CurrentPaceCategory = PaceCategory.Tied;
+                }
+                else
+                {
+                    TimeSpan currentProjectedTimeSpan = CurrentProjectedTime[ActualTimingMethod] ?? TimeSpan.Zero;
+                    if (currentProjectedTimeSpan != newProjectedTimeSpan)
+                    {
+                        CurrentPaceCategory = GetCurrentPaceCategory(newProjectedTimeSpan, currentProjectedTimeSpan);
+                    }
+                }
+
+                // Update the current projected time.
+                CurrentProjectedTime = newProjectedTime;
+                InternalComponent.TimeValue = newProjectedTimeSpan;
                 CurrentProjectionValid = true;
             }
 
@@ -527,8 +670,7 @@ namespace LiveSplit.UI.Components
             CurrentState.OnSplit -= state_OnSplitChange;
             CurrentState.OnSkipSplit -= state_OnSplitChange;
             CurrentState.OnUndoSplit -= state_OnSplitChange;
-            CurrentState.OnSwitchComparisonNext -= state_OnSwitchComparison;
-            CurrentState.OnSwitchComparisonPrevious -= state_OnSwitchComparison;
+            CurrentState.OnReset -= state_OnReset;
         }
 
         // I do not know what this is for.
