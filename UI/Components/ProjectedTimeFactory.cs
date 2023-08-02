@@ -27,6 +27,6 @@ namespace LiveSplit.UI.Components
         // GitHub or somewhere, you can ignore this.
         public string XMLURL => UpdateURL + "Components/update.LiveSplit.ProjectedTime.xml";
 
-        public Version Version => Version.Parse("1.1.0");
+        public Version Version => Version.Parse("1.2.0");
     }
 }
