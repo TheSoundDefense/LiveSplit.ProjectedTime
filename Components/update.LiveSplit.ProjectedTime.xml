@@ -1,4 +1,20 @@
 <updates>
+  <update version="1.1.1">
+    <files>
+      <file path="Components/LiveSplit.ProjectedTime.dll" status="changed" />
+    </files>
+    <changelog>
+      <change>
+        Fixed an issue where the projected time was incorrect when skipping a split.
+      </change>
+      <change>
+        Fixed an issue where the time would not reset correctly if the runner got a new best split.
+      </change>
+      <change>
+        Fixed various bugs regarding pace-based color.
+      </change>
+    </changelog>
+  </update>
   <update version="1.1.0">
     <files>
       <file path="Components/LiveSplit.ProjectedTime.dll" status="changed" />
