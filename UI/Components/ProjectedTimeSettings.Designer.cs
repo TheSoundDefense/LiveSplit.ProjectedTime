@@ -44,6 +44,9 @@ namespace LiveSplit.UI.Components
             this.chkTrailingZeroes = new System.Windows.Forms.CheckBox();
             this.labelColorGroupBox = new System.Windows.Forms.GroupBox();
             this.labelColorLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.chkOverrideLabelColor = new System.Windows.Forms.CheckBox();
+            this.labelColorLabel = new System.Windows.Forms.Label();
+            this.btnLabelColor = new System.Windows.Forms.Button();
             this.projectionGroupBox = new System.Windows.Forms.GroupBox();
             this.projectionLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.basisGroupBox = new System.Windows.Forms.GroupBox();
@@ -54,18 +57,15 @@ namespace LiveSplit.UI.Components
             this.timingLabel = new System.Windows.Forms.Label();
             this.projectionColorGroupBox = new System.Windows.Forms.GroupBox();
             this.projectionColorLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.chkOverrideLabelColor = new System.Windows.Forms.CheckBox();
-            this.labelColorLabel = new System.Windows.Forms.Label();
-            this.btnLabelColor = new System.Windows.Forms.Button();
-            this.chkOverrideProjectionColor = new System.Windows.Forms.CheckBox();
-            this.btnProjectionColor = new System.Windows.Forms.Button();
             this.projectionColorLabel = new System.Windows.Forms.Label();
+            this.btnProjectionColor = new System.Windows.Forms.Button();
+            this.chkOverrideProjectionColor = new System.Windows.Forms.CheckBox();
+            this.chkPaceColor = new System.Windows.Forms.CheckBox();
             this.bgColorLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.btnBgColor1 = new System.Windows.Forms.Button();
             this.btnBgColor2 = new System.Windows.Forms.Button();
+            this.btnBgColor1 = new System.Windows.Forms.Button();
             this.bgColorLabel = new System.Windows.Forms.Label();
             this.cmbGradientType = new System.Windows.Forms.ComboBox();
-            this.chkPaceColor = new System.Windows.Forms.CheckBox();
             this.topLevelLayoutPanel.SuspendLayout();
             this.labelGroupBox.SuspendLayout();
             this.labelLayoutPanel.SuspendLayout();
@@ -300,6 +300,41 @@ namespace LiveSplit.UI.Components
             this.labelColorLayoutPanel.Size = new System.Drawing.Size(811, 105);
             this.labelColorLayoutPanel.TabIndex = 0;
             // 
+            // chkOverrideLabelColor
+            // 
+            this.chkOverrideLabelColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkOverrideLabelColor.AutoSize = true;
+            this.chkOverrideLabelColor.Location = new System.Drawing.Point(3, 7);
+            this.chkOverrideLabelColor.Name = "chkOverrideLabelColor";
+            this.chkOverrideLabelColor.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.chkOverrideLabelColor.Size = new System.Drawing.Size(285, 37);
+            this.chkOverrideLabelColor.TabIndex = 0;
+            this.chkOverrideLabelColor.Text = "Override Layout Settings";
+            this.chkOverrideLabelColor.UseVisualStyleBackColor = true;
+            this.chkOverrideLabelColor.CheckedChanged += new System.EventHandler(this.chkOverrideLabelColor_CheckedChanged);
+            // 
+            // labelColorLabel
+            // 
+            this.labelColorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelColorLabel.AutoSize = true;
+            this.labelColorLabel.Location = new System.Drawing.Point(3, 66);
+            this.labelColorLabel.Name = "labelColorLabel";
+            this.labelColorLabel.Size = new System.Drawing.Size(285, 25);
+            this.labelColorLabel.TabIndex = 1;
+            this.labelColorLabel.Text = "Color:";
+            // 
+            // btnLabelColor
+            // 
+            this.btnLabelColor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnLabelColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnLabelColor.Location = new System.Drawing.Point(294, 55);
+            this.btnLabelColor.Name = "btnLabelColor";
+            this.btnLabelColor.Size = new System.Drawing.Size(47, 47);
+            this.btnLabelColor.TabIndex = 2;
+            this.btnLabelColor.UseVisualStyleBackColor = false;
+            this.btnLabelColor.Click += new System.EventHandler(this.ColorButtonClick);
+            // 
             // projectionGroupBox
             // 
             this.projectionGroupBox.AutoSize = true;
@@ -335,9 +370,9 @@ namespace LiveSplit.UI.Components
             | System.Windows.Forms.AnchorStyles.Right)));
             this.basisGroupBox.AutoSize = true;
             this.basisGroupBox.Controls.Add(this.basisLayoutPanel);
-            this.basisGroupBox.Location = new System.Drawing.Point(3, 196);
+            this.basisGroupBox.Location = new System.Drawing.Point(3, 202);
             this.basisGroupBox.Name = "basisGroupBox";
-            this.basisGroupBox.Size = new System.Drawing.Size(817, 147);
+            this.basisGroupBox.Size = new System.Drawing.Size(817, 141);
             this.basisGroupBox.TabIndex = 6;
             this.basisGroupBox.TabStop = false;
             this.basisGroupBox.Text = "Basis";
@@ -358,7 +393,7 @@ namespace LiveSplit.UI.Components
             this.basisLayoutPanel.RowCount = 2;
             this.basisLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.basisLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.basisLayoutPanel.Size = new System.Drawing.Size(811, 119);
+            this.basisLayoutPanel.Size = new System.Drawing.Size(811, 113);
             this.basisLayoutPanel.TabIndex = 0;
             // 
             // timingComboBox
@@ -370,7 +405,7 @@ namespace LiveSplit.UI.Components
             "Current Timing Method",
             "Real Time",
             "Game Time"});
-            this.timingComboBox.Location = new System.Drawing.Point(286, 73);
+            this.timingComboBox.Location = new System.Drawing.Point(286, 68);
             this.timingComboBox.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.timingComboBox.Name = "timingComboBox";
             this.timingComboBox.Size = new System.Drawing.Size(520, 32);
@@ -387,7 +422,7 @@ namespace LiveSplit.UI.Components
             "Personal Best",
             "Best Segments",
             "Average Segments"});
-            this.cmpComboBox.Location = new System.Drawing.Point(286, 13);
+            this.cmpComboBox.Location = new System.Drawing.Point(286, 11);
             this.cmpComboBox.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.cmpComboBox.Name = "cmpComboBox";
             this.cmpComboBox.Size = new System.Drawing.Size(520, 32);
@@ -398,7 +433,7 @@ namespace LiveSplit.UI.Components
             // 
             this.cmpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.cmpLabel.AutoSize = true;
-            this.cmpLabel.Location = new System.Drawing.Point(3, 17);
+            this.cmpLabel.Location = new System.Drawing.Point(3, 15);
             this.cmpLabel.Name = "cmpLabel";
             this.cmpLabel.Size = new System.Drawing.Size(275, 25);
             this.cmpLabel.TabIndex = 2;
@@ -408,7 +443,7 @@ namespace LiveSplit.UI.Components
             // 
             this.timingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.timingLabel.AutoSize = true;
-            this.timingLabel.Location = new System.Drawing.Point(3, 76);
+            this.timingLabel.Location = new System.Drawing.Point(3, 72);
             this.timingLabel.Name = "timingLabel";
             this.timingLabel.Size = new System.Drawing.Size(275, 25);
             this.timingLabel.TabIndex = 3;
@@ -421,7 +456,7 @@ namespace LiveSplit.UI.Components
             this.projectionColorGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.projectionColorGroupBox.Location = new System.Drawing.Point(3, 3);
             this.projectionColorGroupBox.Name = "projectionColorGroupBox";
-            this.projectionColorGroupBox.Size = new System.Drawing.Size(817, 187);
+            this.projectionColorGroupBox.Size = new System.Drawing.Size(817, 193);
             this.projectionColorGroupBox.TabIndex = 7;
             this.projectionColorGroupBox.TabStop = false;
             this.projectionColorGroupBox.Text = "Color";
@@ -443,49 +478,36 @@ namespace LiveSplit.UI.Components
             this.projectionColorLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.projectionColorLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.projectionColorLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.projectionColorLayoutPanel.Size = new System.Drawing.Size(811, 159);
+            this.projectionColorLayoutPanel.Size = new System.Drawing.Size(811, 165);
             this.projectionColorLayoutPanel.TabIndex = 0;
             // 
-            // chkOverrideLabelColor
+            // projectionColorLabel
             // 
-            this.chkOverrideLabelColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkOverrideLabelColor.AutoSize = true;
-            this.chkOverrideLabelColor.Location = new System.Drawing.Point(3, 7);
-            this.chkOverrideLabelColor.Name = "chkOverrideLabelColor";
-            this.chkOverrideLabelColor.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.chkOverrideLabelColor.Size = new System.Drawing.Size(284, 37);
-            this.chkOverrideLabelColor.TabIndex = 0;
-            this.chkOverrideLabelColor.Text = "Override Layout Settings";
-            this.chkOverrideLabelColor.UseVisualStyleBackColor = true;
-            this.chkOverrideLabelColor.CheckedChanged += new System.EventHandler(this.chkOverrideLabelColor_CheckedChanged);
+            this.projectionColorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.projectionColorLabel.AutoSize = true;
+            this.projectionColorLabel.Location = new System.Drawing.Point(3, 125);
+            this.projectionColorLabel.Name = "projectionColorLabel";
+            this.projectionColorLabel.Size = new System.Drawing.Size(284, 25);
+            this.projectionColorLabel.TabIndex = 4;
+            this.projectionColorLabel.Text = "Color:";
             // 
-            // labelColorLabel
+            // btnProjectionColor
             // 
-            this.labelColorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelColorLabel.AutoSize = true;
-            this.labelColorLabel.Location = new System.Drawing.Point(3, 66);
-            this.labelColorLabel.Name = "labelColorLabel";
-            this.labelColorLabel.Size = new System.Drawing.Size(284, 25);
-            this.labelColorLabel.TabIndex = 1;
-            this.labelColorLabel.Text = "Color:";
-            // 
-            // btnLabelColor
-            // 
-            this.btnLabelColor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.btnProjectionColor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLabelColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnLabelColor.Location = new System.Drawing.Point(293, 55);
-            this.btnLabelColor.Name = "btnLabelColor";
-            this.btnLabelColor.Size = new System.Drawing.Size(47, 47);
-            this.btnLabelColor.TabIndex = 2;
-            this.btnLabelColor.UseVisualStyleBackColor = false;
-            this.btnLabelColor.Click += new System.EventHandler(this.ColorButtonClick);
+            this.btnProjectionColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnProjectionColor.Location = new System.Drawing.Point(293, 113);
+            this.btnProjectionColor.Name = "btnProjectionColor";
+            this.btnProjectionColor.Size = new System.Drawing.Size(47, 49);
+            this.btnProjectionColor.TabIndex = 3;
+            this.btnProjectionColor.UseVisualStyleBackColor = false;
+            this.btnProjectionColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // chkOverrideProjectionColor
             // 
             this.chkOverrideProjectionColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkOverrideProjectionColor.AutoSize = true;
-            this.chkOverrideProjectionColor.Location = new System.Drawing.Point(3, 59);
+            this.chkOverrideProjectionColor.Location = new System.Drawing.Point(3, 64);
             this.chkOverrideProjectionColor.Name = "chkOverrideProjectionColor";
             this.chkOverrideProjectionColor.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.chkOverrideProjectionColor.Size = new System.Drawing.Size(284, 37);
@@ -494,27 +516,19 @@ namespace LiveSplit.UI.Components
             this.chkOverrideProjectionColor.UseVisualStyleBackColor = true;
             this.chkOverrideProjectionColor.CheckedChanged += new System.EventHandler(this.chkOverrideProjectionColor_CheckedChanged);
             // 
-            // btnProjectionColor
+            // chkPaceColor
             // 
-            this.btnProjectionColor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnProjectionColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnProjectionColor.Location = new System.Drawing.Point(293, 107);
-            this.btnProjectionColor.Name = "btnProjectionColor";
-            this.btnProjectionColor.Size = new System.Drawing.Size(47, 49);
-            this.btnProjectionColor.TabIndex = 3;
-            this.btnProjectionColor.UseVisualStyleBackColor = false;
-            this.btnProjectionColor.Click += new System.EventHandler(this.ColorButtonClick);
-            // 
-            // projectionColorLabel
-            // 
-            this.projectionColorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.projectionColorLabel.AutoSize = true;
-            this.projectionColorLabel.Location = new System.Drawing.Point(3, 119);
-            this.projectionColorLabel.Name = "projectionColorLabel";
-            this.projectionColorLabel.Size = new System.Drawing.Size(284, 25);
-            this.projectionColorLabel.TabIndex = 4;
-            this.projectionColorLabel.Text = "Color:";
+            this.chkPaceColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkPaceColor.AutoSize = true;
+            this.projectionColorLayoutPanel.SetColumnSpan(this.chkPaceColor, 2);
+            this.chkPaceColor.Location = new System.Drawing.Point(3, 9);
+            this.chkPaceColor.Name = "chkPaceColor";
+            this.chkPaceColor.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.chkPaceColor.Size = new System.Drawing.Size(805, 37);
+            this.chkPaceColor.TabIndex = 5;
+            this.chkPaceColor.Text = "Use Text Color to Indicate Pace";
+            this.chkPaceColor.UseVisualStyleBackColor = true;
+            this.chkPaceColor.CheckStateChanged += new System.EventHandler(this.chkPaceColor_CheckStateChanged);
             // 
             // bgColorLayoutPanel
             // 
@@ -536,18 +550,6 @@ namespace LiveSplit.UI.Components
             this.bgColorLayoutPanel.Size = new System.Drawing.Size(829, 54);
             this.bgColorLayoutPanel.TabIndex = 7;
             // 
-            // btnBgColor1
-            // 
-            this.btnBgColor1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnBgColor1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnBgColor1.Location = new System.Drawing.Point(299, 3);
-            this.btnBgColor1.Name = "btnBgColor1";
-            this.btnBgColor1.Size = new System.Drawing.Size(47, 48);
-            this.btnBgColor1.TabIndex = 3;
-            this.btnBgColor1.UseVisualStyleBackColor = false;
-            this.btnBgColor1.Click += new System.EventHandler(this.ColorButtonClick);
-            // 
             // btnBgColor2
             // 
             this.btnBgColor2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -559,6 +561,18 @@ namespace LiveSplit.UI.Components
             this.btnBgColor2.TabIndex = 4;
             this.btnBgColor2.UseVisualStyleBackColor = false;
             this.btnBgColor2.Click += new System.EventHandler(this.ColorButtonClick);
+            // 
+            // btnBgColor1
+            // 
+            this.btnBgColor1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnBgColor1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnBgColor1.Location = new System.Drawing.Point(299, 3);
+            this.btnBgColor1.Name = "btnBgColor1";
+            this.btnBgColor1.Size = new System.Drawing.Size(47, 48);
+            this.btnBgColor1.TabIndex = 3;
+            this.btnBgColor1.UseVisualStyleBackColor = false;
+            this.btnBgColor1.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // bgColorLabel
             // 
@@ -579,25 +593,11 @@ namespace LiveSplit.UI.Components
             "Plain",
             "Vertical",
             "Horizontal"});
-            this.cmbGradientType.Location = new System.Drawing.Point(405, 10);
+            this.cmbGradientType.Location = new System.Drawing.Point(405, 11);
             this.cmbGradientType.Name = "cmbGradientType";
             this.cmbGradientType.Size = new System.Drawing.Size(421, 32);
             this.cmbGradientType.TabIndex = 6;
             this.cmbGradientType.SelectedIndexChanged += new System.EventHandler(this.cmbGradientType_SelectedIndexChanged);
-            // 
-            // chkPaceColor
-            // 
-            this.chkPaceColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkPaceColor.AutoSize = true;
-            this.projectionColorLayoutPanel.SetColumnSpan(this.chkPaceColor, 2);
-            this.chkPaceColor.Location = new System.Drawing.Point(3, 7);
-            this.chkPaceColor.Name = "chkPaceColor";
-            this.chkPaceColor.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.chkPaceColor.Size = new System.Drawing.Size(805, 37);
-            this.chkPaceColor.TabIndex = 5;
-            this.chkPaceColor.Text = "Use Text Color to Indicate Pace";
-            this.chkPaceColor.UseVisualStyleBackColor = true;
-            this.chkPaceColor.CheckStateChanged += new System.EventHandler(this.chkPaceColor_CheckStateChanged);
             // 
             // ProjectedTimeSettings
             // 
