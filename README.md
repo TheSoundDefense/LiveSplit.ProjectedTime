@@ -1,6 +1,8 @@
 LiveSplit.ProjectedTime
 =======================
 
+"It's the greatest thing to happen to speedrunning." - SpikeVegeta
+
 This LiveSplit component displays an estimated final time for the run, given the runner's current rate of time gain/loss. The component can also display a percentage estimate of how much of the run is complete.
 
 For example, if the runner has lost 10 seconds in the first 10% of the run, the component will project that the runner will lose 100 seconds over the entire run, and display a projected time accordingly.
